@@ -71,3 +71,4 @@ The public data sets used in the paper to reproduce our results is available in 
 * [Landsat 8 OLI](https://gici.uab.cat/GiciWebPage/datasets.php)
 * [AVIRIS calibrated](https://gici.uab.cat/GiciWebPage/datasets.php)
 * [AVIRIS uncalibrated](https://cwe.ccsds.org/sls/docs/Forms/AllItems.aspx?RootFolder=%2Fsls%2Fdocs%2FSLS%2DDC%2F123%2E0%2DB%2DInfo%2FTestData%2FAVIRIS&FolderCTID=0x012000439B56FF51847E41B5728F9730D7B55F&View=%7BAE8FB44C%2DE80A%2D42CF%2D8558%2DFB495ABB675F%7D)
+* [DOTA v1.0](https://captain-whu.github.io/DOTA/#)
