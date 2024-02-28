@@ -1,44 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Plantilla xarxes neurals AE amb coll d'ampolla modulat 2023032306
-V1.0
+mcos2024 8bit architecture
+V3.6
 Sebastià Mijares i Verdú - GICI, UAB
 sebastia.mijares@uab.cat
 
-Plantilla de script per a construir, entrenar, i utilitzar xarxes neurals per a la compressió d'imatges de teledetecció hiperespectrals. Per a crear una nova xarxa, cal copiar aquest script i adaptar els paràmetres desitjats tal i com  s'explica a "com utilitzar aquest codi".
-
-Aquest script està basat en CSMR2023032301 v3.5.
-
-Com utilitzar aquest codi
--------------------------
-
-Aquest codi s'executa des de un terminal. Amb la comanda -h s'hi detalla l'ajuda d'ús sobre les funcions: entrenament (train), compressió (compress), i reconstrucció (decompress). En aquesta guia s'explica  com construir models utilitzant aquesta plantilla.
-
-Hi ha dues xarxes a entrenar: la codificadora (Analysis Transform) i la reconstructora (Synthesis transform). Per a canviar el nombre i tipus de capes de cadascuna, cal modificar en aquest script les classes AnalysisTransform i/o SynthesisTransform. Es pot trobar més informació sobre els tipus de capa a la documentació oficial de TF.
-
-Para atenció a que els outputs de la codificadora i els inputs de la reconstructora tenen les mateixes mides (com a tensors). El nombre de filtres és el nombre de bandes (que ha de coincidir de la darrera capa de la codificadora amb la primera de la reconstructora), les strides_down divideixen per aquell valor les dimensions espacials (totes) i les strides_up multipliquen les dimensions espacials. Per tant, el producte de les strides_down de la codificadora ha de coincidir amb el producte de les strides_up de la reconstructora.
-
-Tots els fitxers que processen aquests models són .raw, sense headers.
-
-Paràmetres
+Parameters
 ----------
 
-data_type: tipus de dades amb que la xarxa operarà
-bit_length: nombre de bits màxims usats en cada valor
-
-Requisits
----------
-
--Mòdul argparse
--Mòdul glob
--Mòdul sys
--Mòdul absl
--Mòdul tensorflow
--Mòdul tensorflow-compression
-
-Desenvolupament
----------------
+data_type: type of data the raw images are stored as.
+bit_length: bit depth of the samples.
 
 """
 
@@ -51,8 +23,9 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_compression as tfc
 import numpy as np
-# import os
 
+# In case of issues running our models on a GPU-enabled device, the following lines of code will ensure running only using CPU.
+# import os
 # os.environ["CUDA_VISIBLE_DEVICES"]="-1"
 
 """
@@ -511,7 +484,7 @@ def compress(args):
         f.write(packed.string)
 
 def transform(args):
-  """Compresses an image."""
+  """Applies main transform to an image."""
   # Load model and use it to compress the image.
   model = tf.keras.models.load_model(args.model_path)
   inputs = glob.glob(args.input_file)
@@ -533,14 +506,14 @@ def transform(args):
       write_raw(path+'_noquant.'+str(int(tf.shape(y)[-1]))+'_'+str(int(width)//16)+'_'+str(int(height)//16)+'_6_1_0.raw', y[0,:,:,:])
 
 def modulation(args):
-  """Compresses an image."""
+  """Generates modulation mask from a given quality parameter."""
   # Load model and use it to compress the image.
   model = tf.keras.models.load_model(args.model_path)
   mod = model.plain_modulation(tf.expand_dims(tf.expand_dims(tf.expand_dims(tf.constant([args.quality]), 0), 0), 0))
   write_raw('./modulated_'+str(args.quality)+'.'+str(int(tf.shape(mod)[-1]))+'_1_1_6_1_0.raw', mod[0,:,:,:])
 
 def inverse_transform(args):
-  """Compresses an image."""
+  """Applies reverse main transform to a latent representation."""
   # Load model and use it to compress the image.
   model = tf.keras.models.load_model(args.model_path)
   inputs = glob.glob(args.input_file)
@@ -671,7 +644,7 @@ def generate_coefficients(args):
     f.close()
 
 def FQcompress(args):
-  """Compresses an image."""
+  """Compresses an image at a target MSE."""
   import skimage.measure
   # Load model and use it to compress the image.
   model = tf.keras.models.load_model(args.model_path)
@@ -705,9 +678,9 @@ def FQcompress(args):
       b = float(coefs[2])
       
       # Quality parameters prediction
-      target_magnitude = np.sqrt((alpha*mse_0)/(args.target_MSE-mse_0))
+      target_magnitude = np.sqrt((alpha*mse_0)/(4*np.maximum(args.target_MSE-mse_0, 0.0001)))
       target_quality = ((target_magnitude-b)/a).astype(np.float32)
-      Q = target_quality.repeat(args.patchsize//16, axis=0).repeat(args.patchsize//16, axis=1)
+      Q = target_quality.repeat(args.patchsize//16, axis=1).repeat(args.patchsize//16, axis=2)
             
       string_max, side_string_max, z_shape, L_max, bps_max = model.modulation(y, x_shape, y_shape, Q)
       
