@@ -13,9 +13,6 @@ This repository is structured as follows:
 .
 ├── architecture_uint16.py
 ├── architecture_uint8.py
-├── models
-│     ├── 
-│     └── 
 └── auxiliary
       ├── bands_extractor.py
       └── image_tiler.py
@@ -72,3 +69,18 @@ The public data sets used in the paper to reproduce our results is available in 
 * [AVIRIS calibrated](https://gici.uab.cat/GiciWebPage/datasets.php)
 * [AVIRIS uncalibrated](https://cwe.ccsds.org/sls/docs/Forms/AllItems.aspx?RootFolder=%2Fsls%2Fdocs%2FSLS%2DDC%2F123%2E0%2DB%2DInfo%2FTestData%2FAVIRIS&FolderCTID=0x012000439B56FF51847E41B5728F9730D7B55F&View=%7BAE8FB44C%2DE80A%2D42CF%2D8558%2DFB495ABB675F%7D)
 * [DOTA v1.0](https://captain-whu.github.io/DOTA/#)
+
+## Models
+
+The models available in this repository are:
+
+| Model name | Data set | Minimum lambda | Maximum lambda |
+| --- | --- | --- | --- |
+| Landsat8_model | Landsat 8 OLI band by band | 0.000001 | 0.0005 |
+| AVIRIS_cal_model | AVIRIS calibrated band by band | 0.00001 | 0.005 |
+| AVIRIS_uncal_model | AVIRIS uncalibrated band by band | 0.000001 | 0.0001 |
+| DOTA_1_low | DOTA v1.0 training set | 0.0001 | 0.01 |
+| DOTA_1_high | DOTA v1.0 training set | 0.0001 | 1 |
+
+Lambda parameters used in training are shown to regenerate the coefficients, if necessary. The pre-trained models can be downloaded from the [GICI main page](https://gici.uab.cat/GiciWebPage/datasets.php).
+
