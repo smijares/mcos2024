@@ -1,4 +1,4 @@
-# mcos2024
+# Fixed-quality compression of remote sensing images with neural networks (2024)
 Code from the S. Mijares, M. Chabert, T. Oberlin and J. Serra-Sagristà paper "Fixed-quality compression of remote sensing images with neural networks" (2024). In this repository you'll find the architecture script, pre-trained models, auxiliary scripts for pre-processing raw images, and usage instructions.
 
 ## Abstract
